@@ -5,7 +5,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class UserService{
-    constructor( private repo : Repository){
+    getHello(): string {
+        throw new Error('Method not implemented.');
+    }
+    constructor( @InjectRepository(User) private repo : Repository<User>){
 
 }
 }
