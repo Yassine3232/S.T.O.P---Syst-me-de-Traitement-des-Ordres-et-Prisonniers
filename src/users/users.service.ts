@@ -5,10 +5,29 @@ import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class UserService{
-    getHello(): string {
-        throw new Error('Method not implemented.');
-    }
-    constructor( @InjectRepository(User) private repo : Repository<User>){
 
-}
+    constructor( @InjectRepository(User) private repo : Repository<User>){}
+    create(email : string, password : string){
+        const user = this.repo.create({email : email, password : password})
+        return this.repo.save(user)
+    }
+
+    async findAll(){
+        return this.repo.find();
+    }
+
+    async findOne(email : string){
+        return await this.repo.findOne({where : {email : email}});
+    }
+
+    async updateUser(id : number, attrs : Partial<User>){
+        const user = await this.repo.findOneBy({id : id})
+        if (!user){
+            return null
+        }
+
+        Object.assign(user, attrs);
+        return this.repo.save(user);
+    }
+
 }

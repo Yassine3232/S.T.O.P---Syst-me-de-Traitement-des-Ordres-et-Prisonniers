@@ -8,3 +8,7 @@ Content-Type: application/json
     "password": "mdp",
     "name" : "sara"
 }
+
+### Get user by name (Path Param)
+GET http://localhost:3000/users/sara
+Accept: application/json
