@@ -1,14 +1,18 @@
-### Create user test
-
-POST http://localhost:3000/users
+### 1. Créer l'utilisateur (Note le /signup)
+POST http://localhost:3000/users/signup
 Content-Type: application/json
 
 {
     "email" : "sara@hotmail.com",
-    "password": "mdp",
+    "password": "un-vrai-mot-de-passe",
     "name" : "sara"
 }
 
-### Get user by name (Path Param)
-GET http://localhost:3000/users/sara
+### 2. Récupérer tout les utilisateurs
+
+GET http://localhost:3000/users
+Accept: application/json
+
+### 3. Récupérer l'utilisateur par nom
+GET http://localhost:3000/users/email/sara@hotmail.com
 Accept: application/json
