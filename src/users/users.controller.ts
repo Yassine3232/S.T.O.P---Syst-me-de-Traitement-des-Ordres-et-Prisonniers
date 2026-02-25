@@ -3,11 +3,14 @@ import { UserService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { SerializeInterceptor } from 'src/interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
 
 @Controller('users')
 export class UserController {
-    
     constructor(private service: UserService){}
+
+
 
     @Post('/signup')
     createUser(@Body() body : CreateUserDto){
@@ -30,11 +33,10 @@ export class UserController {
     }
 
     //@UseInterceptors(ClassSerializerInterceptor)
-    @UseInterceptors(SerializeInterceptor)
+    @Serialize(UserDto)
     @Get(':id') // Route : GET /users/1
         async getUserById(@Param('id', ParseIntPipe) id: number) {
             const user = await this.service.findById(id);
-            console.log("Handler is running")
             if (!user) {
             throw new NotFoundException(`Aucun utilisateur trouvé avec l'email : ${id}`);
             }
