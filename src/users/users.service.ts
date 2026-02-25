@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ClassSerializerInterceptor, Injectable, UseInterceptors } from "@nestjs/common";
 import { User } from "./user.entity";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -18,6 +18,11 @@ export class UserService{
 
     async findOne(email : string){
         return await this.repo.findOne({where : {email : email}});
+    }
+
+
+    async findById(id : number){
+        return await this.repo.findOne({where : {id : id}});
     }
 
     async updateUser(id : number, attrs : Partial<User>){

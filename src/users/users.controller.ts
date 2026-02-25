@@ -1,7 +1,8 @@
-import { Body, Controller, Get, NotFoundException, Param, Patch, Post} from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, UseInterceptors} from '@nestjs/common';
 import { UserService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { SerializeInterceptor } from 'src/interceptors/serialize.interceptor';
 
 @Controller('users')
 export class UserController {
@@ -27,6 +28,18 @@ export class UserController {
         }
         return user;
     }
+
+    //@UseInterceptors(ClassSerializerInterceptor)
+    @UseInterceptors(SerializeInterceptor)
+    @Get(':id') // Route : GET /users/1
+        async getUserById(@Param('id', ParseIntPipe) id: number) {
+            const user = await this.service.findById(id);
+            console.log("Handler is running")
+            if (!user) {
+            throw new NotFoundException(`Aucun utilisateur trouvé avec l'email : ${id}`);
+            }
+            return user;
+        }
 
     @Patch('/:id')
     updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
