@@ -31,4 +31,4 @@ GET http://localhost:3000/auth/email/adam@hotmail.com
 GET http://localhost:3000/auth/1
 
 ### 7. Test "whoAmI"
-POST http://localhost:3000/auth/whoami
+GET http://localhost:3000/auth/whoami
