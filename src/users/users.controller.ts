@@ -5,17 +5,18 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { SerializeInterceptor } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { AuthService } from './auth/auth.service';
 
-@Controller('users')
+@Controller('auth')
 export class UserController {
-    constructor(private service: UserService){}
+    constructor(private service: UserService, private authservice : AuthService){}
 
 
 
     @Post('/signup')
     createUser(@Body() body : CreateUserDto){
         //console.log(body)
-        return this.service.create(body.email, body.password);
+        this.authservice.signup(body.email, body.password);
     }
 
     @Get()
@@ -25,7 +26,7 @@ export class UserController {
 
     @Get('/email/:email') 
     async getUserByEmail(@Param('email') email: string) {
-        const user = await this.service.findOne(email); // Appel de ta méthode existante
+        const user = await this.service.findByEmail(email); // Appel de ta méthode existante
         if (!user) {
             throw new NotFoundException(`Aucun utilisateur trouvé avec l'email : ${email}`);
         }
