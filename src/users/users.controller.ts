@@ -8,9 +8,10 @@ import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { AuthService } from './auth/auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
-import { CurrentUserInterceptor } from './interceptors/urrent-user.interceptor';
+import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 
 @Controller('auth')
+//@UseInterceptors(CurrentUserInterceptor)
 export class UserController {
     constructor(private service: UserService, private authservice : AuthService){}
 
@@ -34,7 +35,6 @@ export class UserController {
         return this.authservice.whoAmI(session.userId);
     }*/
 
-    @Serialize(CurrentUserInterceptor)
     @Get('/whoami')
     whoAmI(@CurrentUser() user : User){
         return user;

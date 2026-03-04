@@ -10,16 +10,12 @@ export class CurrentUserInterceptor implements NestInterceptor{
         const request = context.switchToHttp().getRequest();
         const userId = request.session.userId;
 
-        if(!userId){
-            throw new NotFoundException("Pas d'utilisateur connecté")
+        if(userId){
+            // Trouver l'uti8lisateur dans la base de données en utilisant le userid
+            const user = await this.userService.findById(userId);
+            // Assigner l'utilisateur trouvé à une nouvelle propriété sur la requête
+            request.currentUser = user;
         }
-
-
-        // Trouver l'uti8lisateur dans la base de données en utilisant le userid
-        const user = await this.userService.findById(userId);
-
-        // Assigner l'utilisateur trouvé à une nouvelle propriété sur la requête
-        request.currentUser = user;
 
         // Go pour request handler ou next interceptor
         return next.handle();
