@@ -49,12 +49,12 @@ export class AuthService {
         return user;
     }
 
-    whoAmI(userId : number){
+    /*whoAmI(userId : number){
         if (userId == null){
             return console.log("Aucun utilisateur connecté");
         }
         else{
             return this.userservice.findById(userId);
         }
-    }
+    }*/
 }

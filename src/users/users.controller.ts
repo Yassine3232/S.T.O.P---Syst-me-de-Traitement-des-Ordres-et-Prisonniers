@@ -7,6 +7,8 @@ import { UserDto } from './dtos/user.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { AuthService } from './auth/auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { User } from './user.entity';
+import { CurrentUserInterceptor } from './interceptors/urrent-user.interceptor';
 
 @Controller('auth')
 export class UserController {
@@ -27,8 +29,14 @@ export class UserController {
         return user;
     }
 
+    /*@Get('/whoami')
+    whoAmI(@Session() session : any){
+        return this.authservice.whoAmI(session.userId);
+    }*/
+
+    @Serialize(CurrentUserInterceptor)
     @Get('/whoami')
-    whoAmI(@CurrentUser() user : any){
+    whoAmI(@CurrentUser() user : User){
         return user;
     }
 
