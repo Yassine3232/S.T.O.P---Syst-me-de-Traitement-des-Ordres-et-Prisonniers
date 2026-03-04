@@ -6,6 +6,7 @@ import { SerializeInterceptor } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { AuthService } from './auth/auth.service';
+import { CurrentUser } from './decorators/current-user.decorator';
 
 @Controller('auth')
 export class UserController {
@@ -22,18 +23,19 @@ export class UserController {
     async signin(@Body() body : CreateUserDto, @Session() session : any){
         const user  = await this.authservice.signin(body.email,body.password)
         session.userId = user.id;
+        console.log("Utilisateur connecté")
         return user;
     }
 
     @Get('/whoami')
-    whoAmI(@Session() session : any){
-        const user = this.service.findById(session.userId)
+    whoAmI(@CurrentUser() user : any){
         return user;
     }
 
     @Post('/signout')
     signOut(@Session() session : any){
         session.userId = null;
+        console.log("Utilisateur déconnecté")
     }
 
     @Get()
