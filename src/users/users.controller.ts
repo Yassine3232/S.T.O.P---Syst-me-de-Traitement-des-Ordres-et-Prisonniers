@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Session, UseInterceptors} from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Session, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -9,39 +9,45 @@ import { AuthService } from './auth/auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
 import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
+import { AllowedLoggedIn, AuthGuard } from 'src/guards/auth-guards';
 
 @Controller('auth')
 //@UseInterceptors(CurrentUserInterceptor)
 export class UserController {
-    constructor(private service: UserService, private authservice : AuthService){}
+    constructor(private service: UserService, private authservice: AuthService) { }
 
     @Post('/signup')
-    async createUser(@Body() body : CreateUserDto, @Session() session : any){
+    async createUser(@Body() body: CreateUserDto, @Session() session: any) {
         const user = await this.authservice.signup(body.email, body.password);
         session.userId = user.id;
         return user;
     }
+    @AllowedLoggedIn()
+    @Get("/message")
+    async getMessage() {
+        return 'TEST GETMESSAGE() METHOD AS NOT LOGGED IN'
+    }
+    @AllowedLoggedIn()
+    @Get("/messageAdmin")
+    async getMessageAsAdmin() {
+        return 'TEST GETMESSAGE() METHOD AS ADMIN'
+    }
 
     @Post('/signin')
-    async signin(@Body() body : CreateUserDto, @Session() session : any){
-        const user  = await this.authservice.signin(body.email,body.password)
+    async signin(@Body() body: CreateUserDto, @Session() session: any) {
+        const user = await this.authservice.signin(body.email, body.password)
         session.userId = user.id;
         console.log("Utilisateur connecté")
         return user;
     }
 
-    /*@Get('/whoami')
-    whoAmI(@Session() session : any){
-        return this.authservice.whoAmI(session.userId);
-    }*/
-
     @Get('/whoami')
-    whoAmI(@CurrentUser() user : User){
+    whoAmI(@CurrentUser() user: User) {
         return user;
     }
 
     @Post('/signout')
-    signOut(@Session() session : any){
+    signOut(@Session() session: any) {
         session.userId = null;
         console.log("Utilisateur déconnecté")
     }
@@ -51,7 +57,7 @@ export class UserController {
         return await this.service.findAll();
     }
 
-    @Get('/email/:email') 
+    @Get('/email/:email')
     async getUserByEmail(@Param('email') email: string) {
         const user = await this.service.findByEmail(email); // Appel de ta méthode existante
         if (!user) {
@@ -60,19 +66,18 @@ export class UserController {
         return user;
     }
 
-    //@UseInterceptors(ClassSerializerInterceptor)
     @Serialize(UserDto)
     @Get(':id') // Route : GET /users/1
-        async getUserById(@Param('id', ParseIntPipe) id: number) {
-            const user = await this.service.findById(id);
-            if (!user) {
+    async getUserById(@Param('id', ParseIntPipe) id: number) {
+        const user = await this.service.findById(id);
+        if (!user) {
             throw new NotFoundException(`Aucun utilisateur trouvé avec l'email : ${id}`);
-            }
-            return user;
         }
+        return user;
+    }
 
-    @Patch('/:id')
-    updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
-        return this.service.updateUser(parseInt(id), body);
+    @Patch('find/:id')
+    updateUser(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserDto) {
+        return this.service.updateUser(id, body);
     }
 }

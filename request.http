@@ -3,9 +3,9 @@ POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
 {
-    "email" : "adam@hotmail.com",
+    "email" : "123@hotmail.com",
     "password": "123",
-    "name" : "adam"
+    "name" : "123"
 }
 
 ### 2. Connecte l'utilisateur
@@ -13,9 +13,9 @@ POST http://localhost:3000/auth/signin
 Content-Type: application/json
 
 {
-    "email" : "adam@hotmail.com",
+    "email" : "123@hotmail.com",
     "password": "123",
-    "name" : "adam"
+    "name" : "123"
 }
 
 ### 3. Déconnecte l'utilisateur
@@ -32,3 +32,9 @@ GET http://localhost:3000/auth/1
 
 ### 7. Test "whoAmI"
 GET http://localhost:3000/auth/whoami
+
+### 8. Test Guard
+GET http://localhost:3000/auth/message
+
+### 8. Test Guard As Admin
+GET http://localhost:3000/auth/messageAdmin
