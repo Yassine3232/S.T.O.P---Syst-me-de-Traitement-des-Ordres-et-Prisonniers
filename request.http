@@ -29,3 +29,30 @@ Content-Type: application/json
     "name": "The Boss",
     "admin": true
 }
+
+### Sign in Admin
+POST http://localhost:3000/auth/signin
+Content-Type: application/json
+
+{
+    "email": "admin@hotmail.com",
+    "password": "123",
+    "name": "The Boss",
+    "admin": true
+}
+### Sign in Regular
+POST http://localhost:3000/auth/signin
+Content-Type: application/json
+
+{
+    "email": "yassine@hotmail.com",
+    "password": "123",
+    "name": "Yassine",
+    "admin": false
+}
+
+### Access admin route
+GET http://localhost:3000/auth/messageAdmin
+
+### WhoamI
+GET http://localhost:3000/auth/whoAmI

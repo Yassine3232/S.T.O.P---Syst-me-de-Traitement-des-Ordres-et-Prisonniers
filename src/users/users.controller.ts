@@ -26,13 +26,11 @@ export class UserController {
     private authservice: AuthService,
   ) {}
 
-  // --- AUTHENTICATION ROUTES ---
 
   @Post('/signup')
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
     const user = await this.authservice.signup(body.email, body.password, body.admin);
     
-    // We store both the ID and the full object so Guards can access .admin immediately
     session.userId = user.id;
     session.CurrentUser = user; 
     

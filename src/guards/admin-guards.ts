@@ -16,7 +16,7 @@ export class AdminGuard implements CanActivate {
       return true;
     }
 
-    console.log(`Guard Blocked: User ${user.email} is not an admin`);
+    console.log(`Guard Blocked: User ${user.id} is not an admin`);
     return false;
   }
 }
