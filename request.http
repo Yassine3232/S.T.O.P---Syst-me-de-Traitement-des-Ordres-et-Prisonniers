@@ -5,7 +5,8 @@ Content-Type: application/json
 {
     "email" : "123@hotmail.com",
     "password": "123",
-    "name" : "123"
+    "name" : "123",
+    "admin": false
 }
 
 ### 2. Connecte l'utilisateur
@@ -13,7 +14,7 @@ POST http://localhost:3000/auth/signin
 Content-Type: application/json
 
 {
-    "email" : "123@hotmail.com",
+    "email" : "1243@hotmail.com",
     "password": "123",
     "name" : "123"
 }

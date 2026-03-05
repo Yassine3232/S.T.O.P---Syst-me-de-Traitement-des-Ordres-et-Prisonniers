@@ -2,13 +2,11 @@ import { Body, ClassSerializerInterceptor, Controller, Get, NotFoundException, P
 import { UserService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { SerializeInterceptor } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { AuthService } from './auth/auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
-import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 import { AllowedLoggedIn, AuthGuard } from 'src/guards/auth-guards';
 
 @Controller('auth')

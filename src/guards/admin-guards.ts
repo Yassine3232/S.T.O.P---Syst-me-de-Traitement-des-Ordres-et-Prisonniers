@@ -1,14 +1,21 @@
 import { ExecutionContext, Injectable , CanActivate, UseInterceptors, UseGuards} from "@nestjs/common";
-import { Observable } from "rxjs";
+
+import { UserService } from "src/users/users.service";
 
 @Injectable()
 export class AdminGuard implements CanActivate {
-  canActivate(context: ExecutionContext) {
+  constructor(private userService: UserService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    
-    return request.currentUser && request.currentUser.admin;
+    const userId = request.session.userId;
+
+    if (!userId) {
+      return false; 
+    }
+
+    const user = await this.userService.findById(userId);
+
+    return !!user?.admin;
   }
-}
-export function AllowedLoggedIn(){
-    return UseGuards(AdminGuard)
 }
