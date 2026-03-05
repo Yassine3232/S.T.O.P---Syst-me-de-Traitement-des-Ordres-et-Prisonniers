@@ -1,21 +1,22 @@
-import { ExecutionContext, Injectable , CanActivate, UseInterceptors, UseGuards} from "@nestjs/common";
-
-import { UserService } from "src/users/users.service";
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
-  constructor(private userService: UserService) {}
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const userId = request.session.userId;
+    
+    const user = request.session?.CurrentUser;
 
-    if (!userId) {
-      return false; 
+    if (!user) {
+      console.log('Guard Blocked: No user in session');
+      return false;
     }
 
-    const user = await this.userService.findById(userId);
+    if (user.admin === true) {
+      return true;
+    }
 
-    return !!user?.admin;
+    console.log(`Guard Blocked: User ${user.email} is not an admin`);
+    return false;
   }
 }

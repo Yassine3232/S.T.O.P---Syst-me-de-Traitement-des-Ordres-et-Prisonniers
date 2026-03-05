@@ -1,41 +1,31 @@
-### 1. Créer l'utilisateur (Note le /signup)
+### Create user
+
 POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
 {
-    "email" : "123@hotmail.com",
+    "email": "yassine@hotmail.com",
     "password": "123",
-    "name" : "123",
+    "name": "Yassine",
     "admin": false
 }
 
-### 2. Connecte l'utilisateur
-POST http://localhost:3000/auth/signin
+### Test Admin access route
+
+GET http://localhost:3000/auth/messageAdmin
+
+### Disconnect
+
+POST http://localhost:3000/auth/signout
+
+### create admin user
+
+POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
 {
-    "email" : "1243@hotmail.com",
+    "email": "admin@hotmail.com",
     "password": "123",
-    "name" : "123"
+    "name": "The Boss",
+    "admin": true
 }
-
-### 3. Déconnecte l'utilisateur
-POST http://localhost:3000/auth/signout
-
-### 4. Récupérer tout les utilisateurs
-GET http://localhost:3000/auth
-
-### 5. Récupérer l'utilisateur par email
-GET http://localhost:3000/auth/email/adam@hotmail.com
-
-### 6. Récupérer l'utilisateur par id
-GET http://localhost:3000/auth/1
-
-### 7. Test "whoAmI"
-GET http://localhost:3000/auth/whoami
-
-### 8. Test Guard
-GET http://localhost:3000/auth/message
-
-### 8. Test Guard As Admin
-GET http://localhost:3000/auth/messageAdmin

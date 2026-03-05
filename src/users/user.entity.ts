@@ -1,23 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, AfterInsert } from "typeorm";
-import { Exclude } from "class-transformer";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class User{
-    @PrimaryGeneratedColumn()
-    id : number
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    email : string
+  @Column()
+  email: string;
 
-    @Exclude()
-    @Column()
-    password : string
+  @Column()
+  password: string;
 
-    @Column({default:true})
-    admin:boolean;
+  @Column({ nullable: true })
+  name: string;
 
-    @AfterInsert()
-    logInsert(){
-        console.log(`User with id ${this.id} has been created`)
-    }
+  @Column({ default: false })
+  admin: boolean;
 }

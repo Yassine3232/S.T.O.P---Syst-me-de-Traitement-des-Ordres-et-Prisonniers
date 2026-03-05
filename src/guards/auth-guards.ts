@@ -1,12 +1,8 @@
-import { ExecutionContext, Injectable , CanActivate, UseInterceptors, UseGuards} from "@nestjs/common";
-import { Observable } from "rxjs";
+import { applyDecorators, UseGuards } from '@nestjs/common';
+import { AdminGuard } from './admin-guards';
 
-@Injectable()
-export class AuthGuard implements CanActivate{
-    canActivate(context: ExecutionContext):boolean | Promise<boolean> | Observable<boolean>{
-        return context.switchToHttp().getRequest().session.userId != null 
-    }
-}
-export function AllowedLoggedIn(){
-    return UseGuards(AuthGuard)
+export function AllowedLoggedIn() {
+  return applyDecorators(
+    UseGuards(AdminGuard)
+  );
 }
