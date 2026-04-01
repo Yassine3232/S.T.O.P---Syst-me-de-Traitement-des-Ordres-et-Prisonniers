@@ -4,7 +4,7 @@ POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
 {
-    "email": "yassine@hotmail.com",
+    "email": "yassine@gmail.com",
     "password": "123",
     "name": "Yassine",
     "admin": false
@@ -56,3 +56,33 @@ GET http://localhost:3000/auth/messageAdmin
 
 ### WhoamI
 GET http://localhost:3000/auth/whoAmI
+
+
+### Create Prisoner (CU04)
+POST http://localhost:3000/prisonniers
+Content-Type: application/json
+
+{
+    "nom": "Adam",
+    "prenom": "Roy",
+    "dateNaissance": "1959-08-22",
+    "accusation": "Racketeering, Extortion",
+    "dureePeine": 20,
+    "dateArrivee": "2026-04-01",
+    "dateSortiePrevue": "2046-04-01",
+    "photoProfil": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1Oj_OnZz5cqZ_aibLOHTP_tUTIYR7E5r9vA&s"
+}
+
+### Get All Prisoners
+GET http://localhost:3000/prisonniers
+
+### Get Specific Prisoner
+GET http://localhost:3000/prisonniers/1
+
+### Update Specific Prisoner
+PATCH http://localhost:3000/prisonniers/6
+Content-Type: application/json
+
+{
+    "photoProfil": "https://imgur.com/a/GYSiURn"
+}

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './users/users.module';
+import { PrisonniersModule } from './prisonniers/prisonniers.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -13,7 +14,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize : true
     }
   ),
-    UserModule],
+    UserModule,
+    PrisonniersModule],
   controllers: [AppController],
   providers: [AppService],
 })

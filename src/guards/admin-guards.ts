@@ -20,3 +20,17 @@ export class AdminGuard implements CanActivate {
     return false;
   }
 }
+
+@Injectable()
+export class ConnectedGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const user = request.session?.CurrentUser;
+
+    if (!user) {
+      return false;
+    }
+
+    return true;
+  }
+}
