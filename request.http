@@ -7,12 +7,9 @@ Content-Type: application/json
     "email": "yassine@gmail.com",
     "password": "123",
     "name": "Yassine",
-    "admin": false
+    "profile": 1,
+    "dateNaissance": "2015-01-01"
 }
-
-### Test Admin access route
-
-GET http://localhost:3000/auth/messageAdmin
 
 ### Disconnect
 
@@ -27,18 +24,18 @@ Content-Type: application/json
     "email": "admin@hotmail.com",
     "password": "123",
     "name": "The Boss",
-    "admin": true
+    "profile": 2,
+    "dateNaissance": "2016-02-02"
 }
 
-### Sign in Admin
+
 POST http://localhost:3000/auth/signin
 Content-Type: application/json
 
 {
     "email": "admin@hotmail.com",
     "password": "123",
-    "name": "The Boss",
-    "admin": true
+    "name": "The Boss"
 }
 ### Sign in Regular
 POST http://localhost:3000/auth/signin
@@ -48,11 +45,9 @@ Content-Type: application/json
     "email": "yassine@hotmail.com",
     "password": "123",
     "name": "Yassine",
-    "admin": false
+    "profile": 0,
+    "dateNaissance": "2017-03-03"
 }
-
-### Access admin route
-GET http://localhost:3000/auth/messageAdmin
 
 ### WhoamI
 GET http://localhost:3000/auth/whoAmI

@@ -29,7 +29,7 @@ export class UserController {
 
   @Post('/signup')
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
-    const user = await this.authservice.signup(body.email, body.password, body.admin);
+    const user = await this.authservice.signup(body.email, body.password, body.profile, body.dateNaissance);
     
     session.userId = user.id;
     session.CurrentUser = user; 
@@ -59,13 +59,7 @@ export class UserController {
   }
 
 
-  @AllowedLoggedIn()
-  @Get('/messageAdmin')
-  async getMessageAsAdmin() {
-    return 'SUCCESS: You are an Admin';
-  }
-
-  @Get('/message')
+   @Get('/message')
   async getMessage() {
     return 'TEST: This route is public or uses a different logic';
   }

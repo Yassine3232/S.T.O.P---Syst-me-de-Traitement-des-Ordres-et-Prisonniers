@@ -1,4 +1,5 @@
-import { IsEmail, IsString, IsBoolean, IsOptional } from 'class-validator';
+import { IsEmail, IsString, IsBoolean, IsOptional, IsEnum, IsNumber, IsDateString } from 'class-validator';
+import { Profile } from '../enum/profile.enum';
 
 export class CreateUserDto {
   @IsEmail()
@@ -11,7 +12,9 @@ export class CreateUserDto {
   @IsOptional()
   name: string;
 
-  @IsBoolean()
-  @IsOptional()
-  admin: boolean;
+  @IsEnum(Profile)
+  profile: Profile;
+
+  @IsDateString()
+  dateNaissance: string;
 }
