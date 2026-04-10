@@ -1,0 +1,14 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Incident } from './incident.entity';
+import { Prisonnier } from '../prisonniers/prisonnier.entity';
+import { IncidentsService } from './incidents.service';
+import { IncidentsController } from './incidents.controller';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Incident, Prisonnier])],
+  providers: [IncidentsService],
+  controllers: [IncidentsController],
+  exports: [IncidentsService],
+})
+export class IncidentsModule {}
