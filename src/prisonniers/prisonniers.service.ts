@@ -1,17 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Prisonnier } from './prisonnier.entity';
+import { Cellule } from 'src/cellules/cellule.entity';
 import { CreatePrisonnierDto } from './dtos/create-prisonnier.dto';
 
 @Injectable()
 export class PrisonniersService {
   constructor(
-    @InjectRepository(Prisonnier) private repoPrisonniers: Repository<Prisonnier>
+    @InjectRepository(Prisonnier)
+    private repoPrisonniers: Repository<Prisonnier>,
+    @InjectRepository(Cellule)
+    private repoCellules: Repository<Cellule>,
   ) {}
 
-  create(donnees: CreatePrisonnierDto) {
-    const nouveauPrisonnier = this.repoPrisonniers.create(donnees);
+  async create(donnees: CreatePrisonnierDto) {
+    const cellule = await this.repoCellules.findOneBy({ nom: donnees.celluleNom });
+    if (!cellule) throw new NotFoundException(`Cellule "${donnees.celluleNom}" introuvable`);
+
+    const nouveauPrisonnier = this.repoPrisonniers.create({...donnees,cellule,});
     return this.repoPrisonniers.save(nouveauPrisonnier);
   }
 

@@ -1,13 +1,8 @@
-import { IsEmail, IsString, IsBoolean, IsOptional, IsEnum, IsNumber, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsDateString } from 'class-validator';
 import { Profile } from '../enum/profile.enum';
+import { UserDto } from './user.dto';
 
-export class CreateUserDto {
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  password: string;
-
+export class CreateUserDto extends UserDto {
   @IsString()
   @IsOptional()
   name: string;

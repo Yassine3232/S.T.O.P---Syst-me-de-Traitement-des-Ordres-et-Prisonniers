@@ -8,8 +8,8 @@ import { Profile } from './enum/profile.enum';
 export class UserService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
-  create(email: string, password: string, profile: Profile, dateNaissance: string) {
-    const user = this.repo.create({ email, password, profile, dateNaissance });
+  create(email: string, password: string, name: string, profile: Profile, dateNaissance: string) {
+    const user = this.repo.create({ email, password, name, profile, dateNaissance });
     return this.repo.save(user);
   }
 
