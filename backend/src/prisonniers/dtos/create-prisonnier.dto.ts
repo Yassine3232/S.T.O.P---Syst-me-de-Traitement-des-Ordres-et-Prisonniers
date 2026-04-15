@@ -25,4 +25,7 @@ export class CreatePrisonnierDto {
   @IsOptional()
   @IsString()
   photoProfil: string;
+
+  @IsString()
+  celluleNom: string;
 }

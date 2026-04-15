@@ -1,3 +1,5 @@
+### USER
+
 ### Create user
 
 POST http://localhost:3000/auth/signup
@@ -7,16 +9,9 @@ Content-Type: application/json
     "email": "yassine@gmail.com",
     "password": "123",
     "name": "Yassine",
-    "admin": false
+    "profile": 1,
+    "dateNaissance": "2015-01-01"
 }
-
-### Test Admin access route
-
-GET http://localhost:3000/auth/messageAdmin
-
-### Disconnect
-
-POST http://localhost:3000/auth/signout
 
 ### create admin user
 
@@ -27,7 +22,17 @@ Content-Type: application/json
     "email": "admin@hotmail.com",
     "password": "123",
     "name": "The Boss",
-    "admin": true
+    "profile": 2,
+    "dateNaissance": "2016-02-02"
+}
+
+### Sign in Regular
+POST http://localhost:3000/auth/signin
+Content-Type: application/json
+
+{
+    "email": "yassine@gmail.com",
+    "password": "123"
 }
 
 ### Sign in Admin
@@ -36,27 +41,17 @@ Content-Type: application/json
 
 {
     "email": "admin@hotmail.com",
-    "password": "123",
-    "name": "The Boss",
-    "admin": true
-}
-### Sign in Regular
-POST http://localhost:3000/auth/signin
-Content-Type: application/json
-
-{
-    "email": "yassine@hotmail.com",
-    "password": "123",
-    "name": "Yassine",
-    "admin": false
+    "password": "123"
 }
 
-### Access admin route
-GET http://localhost:3000/auth/messageAdmin
 
 ### WhoamI
 GET http://localhost:3000/auth/whoAmI
 
+### Disconnect
+POST http://localhost:3000/auth/signout
+
+### PRISONNIER
 
 ### Create Prisoner (CU04)
 POST http://localhost:3000/prisonniers
@@ -70,7 +65,8 @@ Content-Type: application/json
     "dureePeine": 20,
     "dateArrivee": "2026-04-01",
     "dateSortiePrevue": "2046-04-01",
-    "photoProfil": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1Oj_OnZz5cqZ_aibLOHTP_tUTIYR7E5r9vA&s"
+    "photoProfil": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1Oj_OnZz5cqZ_aibLOHTP_tUTIYR7E5r9vA&s",
+    "celluleNom": "A1"
 }
 
 ### Get All Prisoners
@@ -85,4 +81,14 @@ Content-Type: application/json
 
 {
     "photoProfil": "https://imgur.com/a/GYSiURn"
+}
+
+### CELLULE
+
+### Create Cellule A1
+POST http://localhost:3000/cellules
+Content-Type: application/json
+
+{
+    "nom": "A1"
 }

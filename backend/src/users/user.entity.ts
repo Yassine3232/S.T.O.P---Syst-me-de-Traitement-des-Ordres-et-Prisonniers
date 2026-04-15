@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Profile } from './enum/profile.enum';
 
 @Entity()
 export class User {
@@ -14,6 +15,9 @@ export class User {
   @Column({ nullable: true })
   name: string;
 
-  @Column({ default: false })
-  admin: boolean;
+  @Column()
+  profile: Profile;
+
+  @Column()
+  dateNaissance: string;
 }

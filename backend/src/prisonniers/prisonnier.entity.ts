@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Cellule } from 'src/cellules/cellule.entity';
 
 @Entity()
 export class Prisonnier {
@@ -28,4 +29,8 @@ export class Prisonnier {
 
   @Column({ type: 'text', nullable: true })
   photoProfil: string;
+
+  @ManyToOne(() => Cellule, (cellule) => cellule.prisonniers)
+  @JoinColumn({ name: 'cellule_name' }) // Optional: customizes foreign key column name
+  cellule!: Cellule;
 }

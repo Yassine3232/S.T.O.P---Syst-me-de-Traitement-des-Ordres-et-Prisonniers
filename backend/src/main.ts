@@ -6,10 +6,7 @@ const cookeSession = require('cookie-session')
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: true,
-    credentials: true
-  });
+  app.enableCors();
   app.use(cookeSession({
     keys : ['mysecretkey']
   }));

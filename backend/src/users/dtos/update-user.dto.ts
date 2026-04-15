@@ -1,13 +1,4 @@
-import { IsEmail, IsOptional, IsString } from "class-validator";
+import { UserDto } from "./user.dto";
 
-
-export class UpdateUserDto{
-
-    @IsEmail()
-    @IsOptional()
-    email :string
-
-    @IsOptional()
-    @IsString()
-    password : string
+export class UpdateUserDto extends UserDto{
 }

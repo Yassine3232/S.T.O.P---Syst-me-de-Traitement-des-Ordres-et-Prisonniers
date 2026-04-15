@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { Profile } from './enum/profile.enum';
 
 @Injectable()
 export class UserService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
-  create(email: string, password: string, admin: boolean = false) {
-    const user = this.repo.create({ email, password, admin });
+  create(email: string, password: string, name: string, profile: Profile, dateNaissance: string) {
+    const user = this.repo.create({ email, password, name, profile, dateNaissance });
     return this.repo.save(user);
   }
 
