@@ -45,7 +45,7 @@ export class VisitesService {
       .where('prisonnier.numeroIdentification = :id', { id: prisonnierId })
       .getMany();
 
-    const visitesPrecedentes = await this.repoVisite.find({ where: { prisonnier: { numeroIdentification: prisonnierId } } });
+    const visitesPrecedentes = await this.repoVisite.find({ where: { prisonnier: { numeroIdentification: prisonnierId } as any } });
 
     return {
       prisonnier,

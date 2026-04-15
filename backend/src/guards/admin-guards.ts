@@ -12,7 +12,7 @@ export class AdminGuard implements CanActivate {
       return false;
     }
 
-    if (user.admin === true) {
+    if (user.profile === 2) {
       return true;
     }
 

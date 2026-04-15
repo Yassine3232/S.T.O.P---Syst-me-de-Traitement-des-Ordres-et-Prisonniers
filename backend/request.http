@@ -1,7 +1,8 @@
-### USER
+############################################################
+# 1. AUTHENTIFICATION & UTILISATEURS
+############################################################
 
-### Create user
-
+### Créer un utilisateur
 POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
@@ -13,8 +14,7 @@ Content-Type: application/json
     "dateNaissance": "2015-01-01"
 }
 
-### create admin user
-
+### Créer un administrateur
 POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
@@ -26,7 +26,7 @@ Content-Type: application/json
     "dateNaissance": "2016-02-02"
 }
 
-### Sign in Regular
+### Se connecter
 POST http://localhost:3000/auth/signin
 Content-Type: application/json
 
@@ -35,7 +35,7 @@ Content-Type: application/json
     "password": "123"
 }
 
-### Sign in Admin
+### Se connecter admin
 POST http://localhost:3000/auth/signin
 Content-Type: application/json
 
@@ -44,16 +44,62 @@ Content-Type: application/json
     "password": "123"
 }
 
-
 ### WhoamI
 GET http://localhost:3000/auth/whoAmI
 
-### Disconnect
+### Se déconnecter
 POST http://localhost:3000/auth/signout
 
-### PRISONNIER
+### Liste utilisateurs
+GET http://localhost:3000/auth
 
-### Create Prisoner (CU04)
+### Trouver par email
+GET http://localhost:3000/auth/email/yassine@gmail.com
+
+### Trouver par ID
+GET http://localhost:3000/auth/1
+
+### Modifier utilisateur
+PATCH http://localhost:3000/auth/1
+Content-Type: application/json
+
+{
+    "name": "Yassine Modifié"
+}
+
+
+############################################################
+# 2. GESTION DES CELLULES
+############################################################
+
+### Créer une cellule
+POST http://localhost:3000/cellules
+Content-Type: application/json
+
+{
+    "nom": "A1"
+}
+
+### Liste des cellules
+GET http://localhost:3000/cellules
+
+### Voir une cellule
+GET http://localhost:3000/cellules/1
+
+### Modifier une cellule
+PATCH http://localhost:3000/cellules/1
+Content-Type: application/json
+
+{
+    "nom": "A1-Modifiée"
+}
+
+
+############################################################
+# 3. GESTION DES PRISONNIERS
+############################################################
+
+### Ajouter un prisonnier
 POST http://localhost:3000/prisonniers
 Content-Type: application/json
 
@@ -69,13 +115,13 @@ Content-Type: application/json
     "celluleNom": "A1"
 }
 
-### Get All Prisoners
+### Liste des prisonniers
 GET http://localhost:3000/prisonniers
 
-### Get Specific Prisoner
+### Voir un prisonnier
 GET http://localhost:3000/prisonniers/1
 
-### Update Specific Prisoner
+### Modifier un prisonnier
 PATCH http://localhost:3000/prisonniers/6
 Content-Type: application/json
 
@@ -83,12 +129,58 @@ Content-Type: application/json
     "photoProfil": "https://imgur.com/a/GYSiURn"
 }
 
-### CELLULE
 
-### Create Cellule A1
-POST http://localhost:3000/cellules
+############################################################
+# 4. GESTION DES INCIDENTS
+############################################################
+
+### Créer un incident
+POST http://localhost:3000/incidents
 Content-Type: application/json
 
 {
-    "nom": "A1"
+    "type": "Bagarre",
+    "description": "Une bagarre a éclaté dans la cour entre deux détenus",
+    "dateHeure": "2026-04-15T10:30:00",
+    "rapportePar": "Garde Dupont",
+    "prisonniersIds": [1]
+}
+
+### Liste des incidents
+GET http://localhost:3000/incidents
+
+### Voir un incident
+GET http://localhost:3000/incidents/1
+
+
+############################################################
+# 5. GESTION DES VISITES
+############################################################
+
+### Demander une visite
+POST http://localhost:3000/visites
+Content-Type: application/json
+
+{
+    "prisonnierId": 1,
+    "nomMembreFamille": "Adam Roy",
+    "lienFamilial": "Frère"
+}
+
+### Liste des visites
+GET http://localhost:3000/visites
+
+### Voir les demandes en attente
+GET http://localhost:3000/visites/en-attente
+
+### Voir dossier prisonnier
+GET http://localhost:3000/visites/dossier/1
+
+### Répondre à une demande
+PATCH http://localhost:3000/visites/1/repondre
+Content-Type: application/json
+
+{
+    "decision": "approuvee",
+    "dateVisite": "2026-04-20T14:00:00"
 }
