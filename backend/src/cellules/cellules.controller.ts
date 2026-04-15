@@ -11,12 +11,6 @@ export class CellulesController {
   @AllowedConnected()
   @Post()
   async createCellule(@Body() body: CreateCelluleDto) {
-    const cellule = await this.service.findByName(body.nom);
-
-    if (cellule) {
-      throw new BadRequestException('Cellule existe.');
-    }
-
     return await this.service.create(body);
   }
 
@@ -29,20 +23,12 @@ export class CellulesController {
   @AllowedConnected()
   @Get('/:id')
   async getCelluleById(@Param('id', ParseIntPipe) id: number) {
-    const Cellule = await this.service.findById(id);
-    if (!Cellule) {
-      throw new NotFoundException(`Cellule avec l'id ${id} est introuvable`);
-    }
-    return Cellule;
+    return await this.service.findById(id);
   }
 
   @AllowedConnected()
   @Patch('/:id')
   async updateCellule(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
-    try {
       return await this.service.update(id, body);
-    } catch (err) {
-      throw new NotFoundException(`Cellule avec l'id ${id} est introuvable. Impossible de le modifier.`);
-    }
   }
 }

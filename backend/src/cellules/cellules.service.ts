@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cellule } from './cellule.entity';
@@ -11,13 +11,22 @@ export class CellulesService {
     @InjectRepository(Cellule) private repoCellules: Repository<Cellule>
   ) {}
 
-  create(donnees: CreateCelluleDto) {
+  async create(donnees: CreateCelluleDto) {
+    const cellule = await this.findByName(donnees.nom);
+
+    if (cellule) {
+      throw new BadRequestException('Cellule existe.');
+    }
+
     const nouveauCellule = this.repoCellules.create(donnees);
     return this.repoCellules.save(nouveauCellule);
   }
 
   async findById(id: number) {
-    if (!id) return null;
+    if (!id) {
+       throw new NotFoundException(`Cellule avec l'id ${id} est introuvable`);
+    }
+
     return await this.repoCellules.findOneBy({ numeroIdentification: id });
   }
 
@@ -41,9 +50,14 @@ export class CellulesService {
   }
 
   async update(id: number, attrs: Partial<Cellule>) {
-    const Cellule = await this.findById(id);
-    if (!Cellule) throw new Error('Cellule not found');
-    Object.assign(Cellule, attrs);
-    return this.repoCellules.save(Cellule);
+    try {
+      const Cellule = await this.findById(id);
+      if (!Cellule) throw new Error('Cellule not found');
+      Object.assign(Cellule, attrs);
+      return this.repoCellules.save(Cellule);
+    }
+    catch (err) {
+      throw new NotFoundException(`Cellule avec l'id ${id} est introuvable. Impossible de le modifier.`);
+    }
   }
 }
