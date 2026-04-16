@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.dash-wrap {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'IBM Plex Mono', monospace;
+  background: #f5f0e8;
+}
+.dash-sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: #2c2c28;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  gap: 2rem;
+}
+.dash-logo .badge {
+  display: inline-block;
+  background: #b35c2a;
+  color: #f5f0e8;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  padding: 3px 8px;
+  margin-bottom: 0.5rem;
+}
+.dash-logo h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: #f5f0e8;
+  line-height: 1;
+}
+.dash-user {
+  border-top: 1px solid #444441;
+  border-bottom: 1px solid #444441;
+  padding: 1rem 0;
+}
+.dash-user-name {
+  font-size: 13px;
+  color: #f5f0e8;
+  font-weight: 500;
+}
+.dash-user-role {
+  font-size: 10px;
+  color: #888780;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+.dash-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+.dash-nav button {
+  background: transparent;
+  border: none;
+  color: #b4b2a9;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  text-align: left;
+  padding: 8px 12px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+}
+.dash-nav button:hover {
+  color: #f5f0e8;
+  background: #444441;
+}
+.dash-logout {
+  background: transparent;
+  border: 1px solid #444441;
+  color: #888780;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  padding: 8px;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: all 0.2s;
+}
+.dash-logout:hover { border-color: #b35c2a; color: #b35c2a; }
+.dash-main {
+  flex: 1;
+  padding: 3rem;
+}
+.dash-main h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  color: #2c2c28;
+  margin-bottom: 0.5rem;
+}
+.dash-main p { color: #888780; font-size: 13px; }
