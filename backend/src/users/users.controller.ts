@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Session,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -18,6 +19,9 @@ import { AuthService } from './auth/auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
 import { AllowedLoggedIn } from '../guards/auth-guards';
+import { Profile } from './enum/profile.enum';
+import { RolesGuard } from 'src/guards/roles-guards';
+import { Roles } from './decorators/permission-user.decorator';
 
 @Controller('auth')
 export class UserController {
@@ -26,7 +30,8 @@ export class UserController {
     private authservice: AuthService,
   ) {}
 
-
+  @UseGuards(RolesGuard)
+  @Roles(Profile.Directeur)
   @Post('/signup')
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
     const user = await this.authservice.signup(body.email, body.password, body.name, body.profile, body.dateNaissance);
@@ -58,18 +63,15 @@ export class UserController {
     return user;
   }
 
-
-   @Get('/message')
-  async getMessage() {
-    return 'TEST: This route is public or uses a different logic';
-  }
-
-
+  @UseGuards(RolesGuard)
+  @Roles(Profile.Directeur)
   @Get()
   findAllUsers() {
     return this.service.findAll();
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Profile.Directeur)
   @Get('/email/:email')
   async getUserByEmail(@Param('email') email: string) {
     const user = await this.service.findByEmail(email);
@@ -80,6 +82,8 @@ export class UserController {
   }
 
   @Serialize(UserDto)
+  @UseGuards(RolesGuard)
+  @Roles(Profile.Directeur)
   @Get('/:id')
   async getUserById(@Param('id', ParseIntPipe) id: number) {
     const user = await this.service.findById(id);
@@ -89,6 +93,8 @@ export class UserController {
     return user;
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Profile.Directeur)
   @Patch('/:id')
   async updateUser(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserDto) {
     return await this.service.update(id, body);

@@ -8,6 +8,7 @@ import { IncidentsModule } from './incidents/incidents.module';
 import { VisitesModule } from './visites/visites.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CellulesSeeder } from './cellules/cellules.seeder';
+import { UsersSeeder } from './users/user.seeder';
 
 @Module({
   imports: [
@@ -27,9 +28,13 @@ import { CellulesSeeder } from './cellules/cellules.seeder';
   providers: [AppService, CellulesSeeder],
 })
 export class AppModule implements OnModuleInit {
-  constructor(private cellulesSeeder: CellulesSeeder) {}
+  constructor(
+    private cellulesSeeder: CellulesSeeder,
+    private usersSeeder: UsersSeeder,
+  ) {}
 
   async onModuleInit() {
     await this.cellulesSeeder.seed();
+    await this.usersSeeder.seed();
   }
 }

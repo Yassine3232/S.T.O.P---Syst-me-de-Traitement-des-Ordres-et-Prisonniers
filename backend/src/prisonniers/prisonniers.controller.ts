@@ -1,13 +1,18 @@
-import { Controller, Post, Get, Patch, Body, Param, NotFoundException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Body, Param, NotFoundException, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { PrisonniersService } from './prisonniers.service';
 import { CreatePrisonnierDto } from './dtos/create-prisonnier.dto';
 import { AllowedConnected } from '../guards/auth-guards';
+import { RolesGuard } from 'src/guards/roles-guards';
+import { Roles } from 'src/users/decorators/permission-user.decorator';
+import { Profile } from 'src/users/enum/profile.enum';
 
 @Controller('prisonniers')
 export class PrisonniersController {
   constructor(private service: PrisonniersService) {}
 
   @AllowedConnected()
+  @UseGuards(RolesGuard)
+  @Roles(Profile.Garde)
   @Post()
   async createPrisonnier(@Body() body: CreatePrisonnierDto) {
     return await this.service.create(body);
@@ -20,6 +25,8 @@ export class PrisonniersController {
   }
 
   @AllowedConnected()
+  @UseGuards(RolesGuard)
+  @Roles(Profile.Garde,Profile.Directeur)
   @Get('/:id')
   async getPrisonnierById(@Param('id', ParseIntPipe) id: number) {
     const prisonnier = await this.service.findById(id);
@@ -30,6 +37,8 @@ export class PrisonniersController {
   }
 
   @AllowedConnected()
+  @UseGuards(RolesGuard)
+  @Roles(Profile.Garde,Profile.Directeur)
   @Patch('/:id')
   async updatePrisonnier(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
     try {
