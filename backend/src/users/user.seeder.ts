@@ -11,7 +11,7 @@ export class UsersSeeder {
   async seed() {
     const usersParDefaut = [
       {
-        email: 'adam@gmail.com',
+        email: 'adamroy7428@gmail.com',
         password: '123',
         name: 'Adam',
         profile: Profile.Garde,
