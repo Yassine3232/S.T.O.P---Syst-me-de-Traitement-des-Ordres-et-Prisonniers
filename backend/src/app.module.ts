@@ -9,6 +9,8 @@ import { VisitesModule } from './visites/visites.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CellulesSeeder } from './cellules/cellules.seeder';
 import { UsersSeeder } from './users/user.seeder';
+import { PrisonniersSeeder } from './prisonniers/prisonnier.seeder';
+
 
 @Module({
   imports: [
@@ -31,10 +33,12 @@ export class AppModule implements OnModuleInit {
   constructor(
     private cellulesSeeder: CellulesSeeder,
     private usersSeeder: UsersSeeder,
+    private prisonniersSeeder: PrisonniersSeeder,
   ) {}
 
   async onModuleInit() {
     await this.cellulesSeeder.seed();
     await this.usersSeeder.seed();
+    await this.prisonniersSeeder.seed();
   }
 }

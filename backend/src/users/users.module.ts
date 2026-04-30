@@ -12,7 +12,7 @@ import { UsersSeeder } from "./user.seeder";
     imports: [TypeOrmModule.forFeature([User])],
     controllers: [UserController],
     providers: [
-      UserService, 
+      UserService,
       AuthService,
       UsersSeeder,
       {
@@ -20,7 +20,7 @@ import { UsersSeeder } from "./user.seeder";
         useClass: CurrentUserInterceptor
       }
     ],
-    exports: [TypeOrmModule, UsersSeeder, AuthService],
+    exports: [TypeOrmModule, UsersSeeder, AuthService, UserService],
   })
-  
+
   export class UserModule {}
