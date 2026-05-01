@@ -27,7 +27,7 @@ export default function Visites() {
   const [vue, setVue] = useState<'toutes' | 'attente'>('toutes');
   const [erreur, setErreur] = useState('');
   const [message, setMessage] = useState('');
-  const [reponseForm, setReponseForm] = useState<{ statut: string; dateVisite: string; motifRefus: string }>({ statut: '', dateVisite: '', motifRefus: '' });
+  const [reponseForm, setReponseForm] = useState<{ decision: string; dateVisite: string; motifRefus: string }>({ decision: '', dateVisite: '', motifRefus: '' });
   const [visiteSelectionnee, setVisiteSelectionnee] = useState<Visite | null>(null);
 
   useEffect(() => { chargerVisites(); }, [vue]);
@@ -46,11 +46,11 @@ export default function Visites() {
 
   const ouvrirReponse = (v: Visite) => {
     setVisiteSelectionnee(v);
-    setReponseForm({ statut: '', dateVisite: '', motifRefus: '' });
+    setReponseForm({ decision: '', dateVisite: '', motifRefus: '' });
   };
 
   const envoyerReponse = async () => {
-    if (!visiteSelectionnee || !reponseForm.statut) return;
+    if (!visiteSelectionnee || !reponseForm.decision) return;
     try {
       await axios.patch(`http://localhost:3000/visites/${visiteSelectionnee.id}/repondre`, reponseForm);
       setMessage('Réponse envoyée avec succès');
@@ -123,24 +123,24 @@ export default function Visites() {
             </p>
             <div className="field-group">
               <label>Décision</label>
-              <select value={reponseForm.statut} onChange={e => setReponseForm({ ...reponseForm, statut: e.target.value })}>
+              <select value={reponseForm.decision} onChange={e => setReponseForm({ ...reponseForm, decision: e.target.value })}>
                 <option value="">-- Choisir --</option>
-                <option value="approuve">Approuver</option>
-                <option value="refuse">Refuser</option>
+                <option value="approuvee">Approuver</option>
+                <option value="refusee">Refuser</option>
               </select>
             </div>
-            {reponseForm.statut === 'approuve' && (
-              <div className="field-group">
-                <label>Date de visite</label>
-                <input type="datetime-local" value={reponseForm.dateVisite} onChange={e => setReponseForm({ ...reponseForm, dateVisite: e.target.value })} />
-              </div>
-            )}
-            {reponseForm.statut === 'refuse' && (
-              <div className="field-group">
-                <label>Motif de refus</label>
-                <input type="text" placeholder="ex: Dossier incomplet" value={reponseForm.motifRefus} onChange={e => setReponseForm({ ...reponseForm, motifRefus: e.target.value })} />
-              </div>
-            )}
+            {reponseForm.decision === 'approuvee' && (
+            <div className="field-group">
+              <label>Date de visite</label>
+              <input type="datetime-local" value={reponseForm.dateVisite} onChange={e => setReponseForm({ ...reponseForm, dateVisite: e.target.value })} />
+            </div>
+          )}
+          {reponseForm.decision === 'refusee' && (
+            <div className="field-group">
+              <label>Motif de refus</label>
+              <input type="text" placeholder="ex: Dossier incomplet" value={reponseForm.motifRefus} onChange={e => setReponseForm({ ...reponseForm, motifRefus: e.target.value })} />
+            </div>
+          )}
             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
               <button className="btn" onClick={envoyerReponse}>Confirmer</button>
               <button className="btn" style={{ background: 'transparent', color: '#2c2c28', border: '2px solid #2c2c28' }} onClick={() => setVisiteSelectionnee(null)}>Annuler</button>
