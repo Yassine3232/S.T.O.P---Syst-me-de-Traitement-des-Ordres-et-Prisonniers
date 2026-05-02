@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cellule } from './cellule.entity';
 import { CreateCelluleDto } from './dtos/create-cellule.dto';
-import { Prisonnier } from 'src/prisonniers/prisonnier.entity';
 
 @Injectable()
 export class CellulesService {
@@ -14,50 +13,58 @@ export class CellulesService {
   async create(donnees: CreateCelluleDto) {
     const cellule = await this.findByName(donnees.nom);
 
-    if (cellule) {
+    if (cellule !== null) {
       throw new BadRequestException('Cellule existe.');
     }
 
-    const nouveauCellule = this.repoCellules.create(donnees);
+    const nouveauCellule = this.repoCellules.create({ nom: donnees.nom });
     return this.repoCellules.save(nouveauCellule);
   }
 
   async findById(id: number) {
     if (!id) {
-       throw new NotFoundException(`Cellule avec l'id ${id} est introuvable`);
+       throw new NotFoundException('Cellule avec l\'id ' + id + ' est introuvable');
     }
 
-    return await this.repoCellules.findOneBy({ numeroIdentification: id });
+    return await this.repoCellules.findOne({ where: { numeroIdentification: id } });
   }
 
   async findByName(nom: string) {
-    if (!nom) return null;
+    if (!nom) {
+      return null;
+    }
 
-    return await this.repoCellules.findOneBy({ nom: nom });
+    return await this.repoCellules.findOne({ where: { nom: nom } });
   }
 
-    async findByNameWithPrisonnier(nom: string) {
-    if (!nom) return null;
+  async findByNameWithPrisonnier(nom: string) {
+    if (!nom) {
+      return null;
+    }
 
     return await this.repoCellules.findOne({ 
-      where: { nom }, 
-      relations: { prisonniers: true } 
+      where: { nom: nom }, 
+      relations: ['prisonniers'] 
     });
   }
 
   findAll() {
-    return this.repoCellules.find();
+    return this.repoCellules.find({ relations: ['prisonniers'] });
   }
 
   async update(id: number, attrs: Partial<Cellule>) {
     try {
-      const Cellule = await this.findById(id);
-      if (!Cellule) throw new Error('Cellule not found');
-      Object.assign(Cellule, attrs);
-      return this.repoCellules.save(Cellule);
+      const cellule = await this.findById(id);
+      if (cellule === null) {
+        throw new Error('Cellule not found');
+      }
+      
+      if (attrs.nom !== undefined) cellule.nom = attrs.nom;
+      
+      return this.repoCellules.save(cellule);
     }
     catch (err) {
-      throw new NotFoundException(`Cellule avec l'id ${id} est introuvable. Impossible de le modifier.`);
+      throw new NotFoundException('Cellule avec l\'id ' + id + ' est introuvable. Impossible de le modifier.');
     }
   }
 }
