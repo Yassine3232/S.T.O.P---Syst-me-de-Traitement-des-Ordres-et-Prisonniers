@@ -16,7 +16,7 @@ interface CompteForm {
   name: string;
   email: string;
   password: string;
-  profile: number | '';
+  profile: string;
   dateNaissance: string;
 }
 
@@ -26,16 +26,23 @@ interface ModifForm {
   dateNaissance: string;
 }
 
-const profileLabel = (profile: number) => {
-  if (profile === 0) return 'Visiteur';
-  if (profile === 1) return 'Garde';
-  if (profile === 2) return 'Directeur';
-  return 'Inconnu';
-};
+function profileLabel(profile: number) {
+  if (profile === 0) {
+    return 'Visiteur';
+  } else if (profile === 1) {
+    return 'Garde';
+  } else if (profile === 2) {
+    return 'Directeur';
+  } else {
+    return 'Inconnu';
+  }
+}
 
 export default function Comptes() {
-  const { user } = useAuth();
+  const auth = useAuth();
+  const user = auth.user;
   const navigate = useNavigate();
+
   const [comptes, setComptes] = useState<Compte[]>([]);
   const [vue, setVue] = useState<'liste' | 'creer' | 'modifier'>('liste');
   const [compteSelectionne, setCompteSelectionne] = useState<Compte | null>(null);
@@ -43,62 +50,157 @@ export default function Comptes() {
   const [erreur, setErreur] = useState('');
 
   const [creerForm, setCruerForm] = useState<CompteForm>({
-    name: '', email: '', password: '', profile: '', dateNaissance: '',
+    name: '', 
+    email: '', 
+    password: '', 
+    profile: '', 
+    dateNaissance: '',
   });
 
   const [modifForm, setModifForm] = useState<ModifForm>({
-    name: '', email: '', dateNaissance: '',
+    name: '', 
+    email: '', 
+    dateNaissance: '',
   });
 
-  useEffect(() => { chargerComptes(); }, []);
+  useEffect(() => {
+    chargerComptes();
+  }, []);
 
-  const chargerComptes = async () => {
+  async function chargerComptes() {
     try {
       const res = await axios.get('http://localhost:3000/auth');
       setComptes(res.data);
-    } catch {
+    } catch (e: any) {
       setErreur('Erreur lors du chargement des comptes');
     }
-  };
+  }
 
-  const creerCompte = async () => {
-    if (!creerForm.name || !creerForm.email || !creerForm.password || creerForm.profile === '' || !creerForm.dateNaissance) {
+  function handleCreerChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    const newForm = { ...creerForm };
+    const name = e.target.name;
+    const value = e.target.value;
+    
+    if (name === 'name') newForm.name = value;
+    else if (name === 'email') newForm.email = value;
+    else if (name === 'password') newForm.password = value;
+    else if (name === 'profile') newForm.profile = value;
+    else if (name === 'dateNaissance') newForm.dateNaissance = value;
+    
+    setCruerForm(newForm);
+  }
+
+  function handleModifChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const newForm = { ...modifForm };
+    const name = e.target.name;
+    const value = e.target.value;
+    
+    if (name === 'name') newForm.name = value;
+    else if (name === 'email') newForm.email = value;
+    else if (name === 'dateNaissance') newForm.dateNaissance = value;
+    
+    setModifForm(newForm);
+  }
+
+  async function creerCompte() {
+    if (creerForm.name === '' || creerForm.email === '' || creerForm.password === '' || creerForm.profile === '' || creerForm.dateNaissance === '') {
       setErreur('Veuillez remplir tous les champs');
       return;
     }
+    
     try {
       await axios.post('http://localhost:3000/auth/signup', {
-        ...creerForm,
+        name: creerForm.name,
+        email: creerForm.email,
+        password: creerForm.password,
         profile: Number(creerForm.profile),
+        dateNaissance: creerForm.dateNaissance
       });
+
       setMessage('Compte créé avec succès');
       setErreur('');
       setCruerForm({ name: '', email: '', password: '', profile: '', dateNaissance: '' });
       setVue('liste');
       chargerComptes();
     } catch (e: any) {
-      setErreur(e.response?.data?.message || 'Erreur lors de la création');
+      if (e.response && e.response.data && e.response.data.message) {
+        setErreur(e.response.data.message);
+      } else {
+        setErreur('Erreur lors de la création');
+      }
     }
-  };
+  }
 
-  const ouvrirModification = (c: Compte) => {
+  function ouvrirModification(c: Compte) {
     setCompteSelectionne(c);
-    setModifForm({ name: c.name, email: c.email, dateNaissance: c.dateNaissance });
+    setModifForm({ 
+      name: c.name, 
+      email: c.email, 
+      dateNaissance: c.dateNaissance 
+    });
     setVue('modifier');
-  };
+  }
 
-  const modifierCompte = async () => {
-    if (!compteSelectionne) return;
+  async function modifierCompte() {
+    if (compteSelectionne === null) {
+      return;
+    }
+    
     try {
-      await axios.patch(`http://localhost:3000/auth/${compteSelectionne.id}`, modifForm);
+      await axios.patch('http://localhost:3000/auth/' + compteSelectionne.id, modifForm);
       setMessage('Compte modifié avec succès');
       setErreur('');
       setVue('liste');
       chargerComptes();
     } catch (e: any) {
-      setErreur(e.response?.data?.message || 'Erreur lors de la modification');
+      if (e.response && e.response.data && e.response.data.message) {
+        setErreur(e.response.data.message);
+      } else {
+        setErreur('Erreur lors de la modification');
+      }
     }
-  };
+  }
+
+  function allerAuxIncidents() { navigate('/incidents'); }
+  function allerAuxPrisonniers() { navigate('/prisonniers'); }
+  function allerAuxCellules() { navigate('/cellules'); }
+  function allerAuxVisites() { navigate('/visites'); }
+  function allerAuxComptes() { navigate('/comptes'); }
+  function deconnexion() { navigate('/'); }
+
+  let userName = '';
+  if (user !== null && user.name) {
+    userName = user.name;
+  }
+
+  function changerVueListe() {
+    setVue('liste');
+    setErreur('');
+    setMessage('');
+  }
+
+  function changerVueCreer() {
+    setVue('creer');
+    setCruerForm({ name: '', email: '', password: '', profile: '', dateNaissance: '' });
+    setErreur('');
+    setMessage('');
+  }
+
+  const isGarde = user?.profile === 1;
+  let roleTexte = 'Directeur';
+  if (isGarde) {
+    roleTexte = 'Garde';
+  }
+
+  let classVueListe = 'tab-btn';
+  if (vue === 'liste') {
+    classVueListe = 'tab-btn active';
+  }
+
+  let classVueCreer = 'tab-btn';
+  if (vue === 'creer') {
+    classVueCreer = 'tab-btn active';
+  }
 
   return (
     <div className="dash-wrap">
@@ -108,33 +210,34 @@ export default function Comptes() {
           <h2>Tableau<br />de bord</h2>
         </div>
         <div className="dash-user">
-          <p className="dash-user-name">{user?.name}</p>
-          <p className="dash-user-role">Directeur</p>
+          <p className="dash-user-name">{userName}</p>
+          <p className="dash-user-role">{roleTexte}</p>
         </div>
         <nav className="dash-nav">
-          <button onClick={() => navigate('/incidents')}>Incidents</button>
-          <button onClick={() => navigate('/prisonniers')}>Prisonniers</button>
-          <button onClick={() => navigate('/visites')}>Visites</button>
-          <button className="active" onClick={() => navigate('/comptes')}>Comptes</button>
+          <button onClick={allerAuxIncidents}>Incidents</button>
+          <button onClick={allerAuxPrisonniers}>Prisonniers</button>
+          <button onClick={allerAuxCellules}>Cellules</button>
+          <button onClick={allerAuxVisites}>Visites</button>
+          <button className="active" onClick={allerAuxComptes}>Comptes</button>
         </nav>
-        <button className="dash-logout" onClick={() => navigate('/')}>Déconnexion</button>
+        <button className="dash-logout" onClick={deconnexion}>Déconnexion</button>
       </div>
 
       <div className="dash-main">
         <div className="page-header">
           <h1>Comptes</h1>
           <div className="header-actions">
-            <button className={`tab-btn ${vue === 'liste' ? 'active' : ''}`} onClick={() => setVue('liste')}>
+            <button className={classVueListe} onClick={changerVueListe}>
               Liste
             </button>
-            <button className={`tab-btn ${vue === 'creer' ? 'active' : ''}`} onClick={() => setVue('creer')}>
+            <button className={classVueCreer} onClick={changerVueCreer}>
               + Créer
             </button>
           </div>
         </div>
 
-        {message && <p className="status ok">{message}</p>}
-        {erreur && <p className="status err">[ ERREUR ] {erreur}</p>}
+        {message !== '' && <p className="status ok">{message}</p>}
+        {erreur !== '' && <p className="status err">[ ERREUR ] {erreur}</p>}
 
         {vue === 'liste' && (
           <div className="table-wrap">
@@ -153,20 +256,22 @@ export default function Comptes() {
                 {comptes.length === 0 && (
                   <tr><td colSpan={6} style={{ textAlign: 'center', color: '#888780' }}>Aucun compte</td></tr>
                 )}
-                {comptes.map(c => (
-                  <tr key={c.id}>
-                    <td>{c.id}</td>
-                    <td>{c.name}</td>
-                    <td>{c.email}</td>
-                    <td><span className="tag">{profileLabel(c.profile)}</span></td>
-                    <td>{c.dateNaissance}</td>
-                    <td>
-                      <button className="action-btn edit" onClick={() => ouvrirModification(c)}>
-                        Modifier
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {comptes.map(function(c) {
+                  return (
+                    <tr key={c.id}>
+                      <td>{c.id}</td>
+                      <td>{c.name}</td>
+                      <td>{c.email}</td>
+                      <td><span className="tag">{profileLabel(c.profile)}</span></td>
+                      <td>{c.dateNaissance}</td>
+                      <td>
+                        <button className="action-btn edit" onClick={function() { ouvrirModification(c); }}>
+                          Modifier
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -178,19 +283,21 @@ export default function Comptes() {
               <div className="field-group">
                 <label>Nom</label>
                 <input
+                  name="name"
                   type="text"
                   placeholder="ex: Dupont"
                   value={creerForm.name}
-                  onChange={e => setCruerForm({ ...creerForm, name: e.target.value })}
+                  onChange={handleCreerChange}
                 />
               </div>
               <div className="field-group">
                 <label>Courriel</label>
                 <input
+                  name="email"
                   type="email"
                   placeholder="ex: dupont@prison.ca"
                   value={creerForm.email}
-                  onChange={e => setCruerForm({ ...creerForm, email: e.target.value })}
+                  onChange={handleCreerChange}
                 />
               </div>
             </div>
@@ -198,17 +305,19 @@ export default function Comptes() {
               <div className="field-group">
                 <label>Mot de passe</label>
                 <input
+                  name="password"
                   type="password"
                   placeholder="••••••••"
                   value={creerForm.password}
-                  onChange={e => setCruerForm({ ...creerForm, password: e.target.value })}
+                  onChange={handleCreerChange}
                 />
               </div>
               <div className="field-group">
                 <label>Profil</label>
                 <select
+                  name="profile"
                   value={creerForm.profile}
-                  onChange={e => setCruerForm({ ...creerForm, profile: Number(e.target.value) })}
+                  onChange={handleCreerChange}
                 >
                   <option value="">-- Choisir --</option>
                   <option value={1}>Garde</option>
@@ -219,41 +328,45 @@ export default function Comptes() {
             <div className="field-group">
               <label>Date de naissance</label>
               <input
+                name="dateNaissance"
                 type="date"
                 value={creerForm.dateNaissance}
-                onChange={e => setCruerForm({ ...creerForm, dateNaissance: e.target.value })}
+                onChange={handleCreerChange}
               />
             </div>
             <button className="btn" onClick={creerCompte}>Créer le compte</button>
           </div>
         )}
 
-        {vue === 'modifier' && compteSelectionne && (
+        {vue === 'modifier' && compteSelectionne !== null && (
           <div className="form-card">
             <div className="row">
               <div className="field-group">
                 <label>Nom</label>
                 <input
+                  name="name"
                   type="text"
                   value={modifForm.name}
-                  onChange={e => setModifForm({ ...modifForm, name: e.target.value })}
+                  onChange={handleModifChange}
                 />
               </div>
               <div className="field-group">
                 <label>Courriel</label>
                 <input
+                  name="email"
                   type="email"
                   value={modifForm.email}
-                  onChange={e => setModifForm({ ...modifForm, email: e.target.value })}
+                  onChange={handleModifChange}
                 />
               </div>
             </div>
             <div className="field-group">
               <label>Date de naissance</label>
               <input
+                name="dateNaissance"
                 type="date"
                 value={modifForm.dateNaissance}
-                onChange={e => setModifForm({ ...modifForm, dateNaissance: e.target.value })}
+                onChange={handleModifChange}
               />
             </div>
             <button className="btn" onClick={modifierCompte}>Sauvegarder</button>

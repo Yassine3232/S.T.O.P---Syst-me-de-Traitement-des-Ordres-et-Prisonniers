@@ -6,7 +6,7 @@ interface SignupForm {
   name: string;
   email: string;
   password: string;
-  profile: number | '';
+  profile: string;
   dateNaissance: string;
 }
 
@@ -18,35 +18,92 @@ export default function Signup() {
     profile: '',
     dateNaissance: '',
   });
+  
   const [reponse, setReponse] = useState('');
   const [erreur, setErreur] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    const newForm = { ...form };
+    const name = e.target.name;
+    const value = e.target.value;
+    
+    if (name === 'name') {
+      newForm.name = value;
+    } else if (name === 'email') {
+      newForm.email = value;
+    } else if (name === 'password') {
+      newForm.password = value;
+    } else if (name === 'profile') {
+      newForm.profile = value;
+    } else if (name === 'dateNaissance') {
+      newForm.dateNaissance = value;
+    }
+    
+    setForm(newForm);
+  }
 
-  const envoyerSignup = async () => {
-    if (!form.name || !form.email || !form.password) {
+  async function envoyerSignup() {
+    if (form.name === '') {
       setErreur('Veuillez remplir tous les champs obligatoires');
       return;
     }
+    if (form.email === '') {
+      setErreur('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+    if (form.password === '') {
+      setErreur('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+    
     try {
+      let profileNumber = 0;
+      if (form.profile !== '') {
+        profileNumber = Number(form.profile);
+      }
+
       const res = await axios.post('http://localhost:3000/auth/signup', {
-        ...form,
-        profile: Number(form.profile),
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        profile: profileNumber,
+        dateNaissance: form.dateNaissance,
       });
-      setReponse(res.data.message);
+      
+      if (res.data && res.data.message) {
+        setReponse(res.data.message);
+      } else {
+        setReponse('Inscription réussie');
+      }
+      
       setErreur('');
     } catch (e: any) {
-      setErreur(e.response?.data?.message || 'Erreur de communication avec NestJS');
+      if (e.response && e.response.data && e.response.data.message) {
+        let msg = e.response.data.message;
+        if (Array.isArray(msg)) {
+          msg = msg[0];
+        }
+        setErreur(msg);
+      } else {
+        setErreur('Erreur de communication avec NestJS');
+      }
       setReponse('');
     }
-  };
+  }
+
+  const barresArray = [];
+  for (let i = 0; i < 8; i++) {
+    barresArray.push(i);
+  }
+
+  let dateTexte = new Date().toLocaleDateString('fr-CA');
 
   return (
     <div className="prison-wrap">
       <div className="bars">
-        {Array.from({ length: 8 }).map((_, i) => <div className="bar" key={i} />)}
+        {barresArray.map(function(i) {
+          return <div className="bar" key={i} />;
+        })}
       </div>
 
       <div className="card">
@@ -87,12 +144,12 @@ export default function Signup() {
 
         <button className="btn" onClick={envoyerSignup}>Enregistrer le détenu</button>
 
-        {reponse && <p className="status ok">[ OK ] {reponse}</p>}
-        {erreur && <p className="status err">[ ERREUR ] {erreur}</p>}
+        {reponse !== '' && <p className="status ok">[ OK ] {reponse}</p>}
+        {erreur !== '' && <p className="status err">[ ERREUR ] {erreur}</p>}
 
         <div className="card-footer">
           <span>SYSTÈME v2.4</span>
-          <span>{new Date().toLocaleDateString('fr-CA')}</span>
+          <span>{dateTexte}</span>
         </div>
       </div>
     </div>

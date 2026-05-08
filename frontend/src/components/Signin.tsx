@@ -7,31 +7,65 @@ import './Signup.css';
 export default function Signin() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [erreur, setErreur] = useState('');
+  
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const auth = useAuth();
+  const login = auth.login;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const newForm = { ...form };
+    const name = e.target.name;
+    const value = e.target.value;
+    
+    if (name === 'email') {
+      newForm.email = value;
+    } else if (name === 'password') {
+      newForm.password = value;
+    }
+    
+    setForm(newForm);
+  }
 
-  const envoyerSignin = async () => {
-    if (!form.email || !form.password) {
+  async function envoyerSignin() {
+    if (form.email === '') {
       setErreur('Veuillez remplir tous les champs');
       return;
     }
+    if (form.password === '') {
+      setErreur('Veuillez remplir tous les champs');
+      return;
+    }
+    
     try {
       const res = await axios.post('http://localhost:3000/auth/signin', form);
       login(res.data);
       navigate('/dashboard');
     } catch (e: any) {
-      setErreur(e.response?.data?.message || 'Erreur de communication avec NestJS');
+      if (e.response && e.response.data && e.response.data.message) {
+        let msg = e.response.data.message;
+        if (Array.isArray(msg)) {
+          msg = msg[0];
+        }
+        setErreur(msg);
+      } else {
+        setErreur('Erreur de communication avec NestJS');
+      }
     }
-  };
+  }
+
+  const barresArray = [];
+  for (let i = 0; i < 8; i++) {
+    barresArray.push(i);
+  }
+
+  let dateTexte = new Date().toLocaleDateString('fr-CA');
 
   return (
     <div className="prison-wrap">
       <div className="bars">
-        {Array.from({ length: 8 }).map((_, i) => <div className="bar" key={i} />)}
+        {barresArray.map(function(i) {
+          return <div className="bar" key={i} />;
+        })}
       </div>
       <div className="card">
         <div className="card-header">
@@ -47,10 +81,10 @@ export default function Signin() {
           <input name="password" type="password" placeholder="••••••••" value={form.password} onChange={handleChange} />
         </div>
         <button className="btn" onClick={envoyerSignin}>Entrer</button>
-        {erreur && <p className="status err">[ ERREUR ] {erreur}</p>}
+        {erreur !== '' && <p className="status err">[ ERREUR ] {erreur}</p>}
         <div className="card-footer">
           <span>SYSTÈME v2.4</span>
-          <span>{new Date().toLocaleDateString('fr-CA')}</span>
+          <span>{dateTexte}</span>
         </div>
       </div>
     </div>
