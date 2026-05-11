@@ -10,6 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CellulesSeeder } from './cellules/cellules.seeder';
 import { UsersSeeder } from './users/user.seeder';
 import { PrisonniersSeeder } from './prisonniers/prisonnier.seeder';
+import { HistoriqueModule } from './historique/historique.module';
 
 
 @Module({
@@ -25,6 +26,7 @@ import { PrisonniersSeeder } from './prisonniers/prisonnier.seeder';
     CellulesModule,
     IncidentsModule,
     VisitesModule,
+    HistoriqueModule,
   ],
   controllers: [AppController],
   providers: [AppService, CellulesSeeder],

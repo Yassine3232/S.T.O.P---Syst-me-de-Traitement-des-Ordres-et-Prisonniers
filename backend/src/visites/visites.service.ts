@@ -6,6 +6,7 @@ import { Prisonnier } from '../prisonniers/prisonnier.entity';
 import { Incident } from '../incidents/incident.entity';
 import { CreerDemandeVisiteDto } from './dtos/creer-demande-visite.dto';
 import { RepondreDemandeVisiteDto } from './dtos/repondre-demande-visite.dto';
+import { HistoriqueService } from '../historique/historique.service';
 
 @Injectable()
 export class VisitesService {
@@ -13,14 +14,12 @@ export class VisitesService {
     @InjectRepository(Visite) private repoVisite: Repository<Visite>,
     @InjectRepository(Prisonnier) private repoPrisonnier: Repository<Prisonnier>,
     @InjectRepository(Incident) private repoIncident: Repository<Incident>,
+    private historiqueService: HistoriqueService,
   ) {}
 
   async soumettreDemandeVisite(donnees: CreerDemandeVisiteDto) {
     const prisonnier = await this.repoPrisonnier.findOne({ where: { numeroIdentification: donnees.prisonnierId } });
-
-    if (!prisonnier) {
-      throw new NotFoundException('Prisonnier introuvable');
-    }
+    if (!prisonnier) throw new NotFoundException('Prisonnier introuvable');
 
     const nouvelleVisite = this.repoVisite.create({
       nomMembreFamille: donnees.nomMembreFamille,
@@ -34,10 +33,7 @@ export class VisitesService {
 
   async consulterDossierPrisonnier(prisonnierId: number) {
     const prisonnier = await this.repoPrisonnier.findOne({ where: { numeroIdentification: prisonnierId } });
-
-    if (!prisonnier) {
-      throw new NotFoundException('Prisonnier introuvable');
-    }
+    if (!prisonnier) throw new NotFoundException('Prisonnier introuvable');
 
     const incidentsLies = await this.repoIncident
       .createQueryBuilder('incident')
@@ -45,32 +41,34 @@ export class VisitesService {
       .where('prisonnier.numeroIdentification = :id', { id: prisonnierId })
       .getMany();
 
-    const visitesPrecedentes = await this.repoVisite.find({ where: { prisonnier: { numeroIdentification: prisonnierId } as any } });
+    const visitesPrecedentes = await this.repoVisite.find({
+      where: { prisonnier: { numeroIdentification: prisonnierId } as any },
+    });
 
-    return {
-      prisonnier,
-      incidents: incidentsLies,
-      visitesPrecedentes,
-    };
+    return { prisonnier, incidents: incidentsLies, visitesPrecedentes };
   }
 
   async repondreDemandeVisite(visiteId: number, donnees: RepondreDemandeVisiteDto) {
     const visite = await this.repoVisite.findOne({ where: { id: visiteId }, relations: ['prisonnier'] });
-
-    if (!visite) {
-      throw new NotFoundException('Demande de visite introuvable');
-    }
-
-    if (visite.statut !== 'en_attente') {
-      throw new BadRequestException('Cette demande a déjà été traitée');
-    }
+    if (!visite) throw new NotFoundException('Demande de visite introuvable');
+    if (visite.statut !== 'en_attente') throw new BadRequestException('Cette demande a déjà été traitée');
 
     if (donnees.decision === 'approuvee') {
       visite.statut = 'approuvee';
       visite.dateVisite = donnees.dateVisite;
+      await this.historiqueService.enregistrer(
+        visite.prisonnier,
+        'visite',
+        `Visite approuvée — ${visite.nomMembreFamille} le ${donnees.dateVisite}`,
+      );
     } else if (donnees.decision === 'refusee') {
       visite.statut = 'refusee';
       visite.motifRefus = donnees.motifRefus;
+      await this.historiqueService.enregistrer(
+        visite.prisonnier,
+        'visite',
+        `Visite refusée — Motif: ${donnees.motifRefus}`,
+      );
     } else {
       throw new BadRequestException('La décision doit être approuvee ou refusee');
     }

@@ -7,9 +7,10 @@ import { VisitesService } from './visites.service';
 import { VisitesController } from './visites.controller';
 import { RolesGuard } from '../guards/roles-guards';
 import { UserModule } from '../users/users.module';
+import { HistoriqueModule } from '../historique/historique.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Visite, Prisonnier, Incident]), UserModule],
+  imports: [TypeOrmModule.forFeature([Visite, Prisonnier, Incident]), UserModule, HistoriqueModule],
   providers: [VisitesService, RolesGuard],
   controllers: [VisitesController],
 })

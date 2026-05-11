@@ -7,10 +7,10 @@ import { Cellule } from '../cellules/cellule.entity';
 import { RolesGuard } from '../guards/roles-guards';
 import { UserModule } from '../users/users.module';
 import { PrisonniersSeeder } from './prisonnier.seeder';
-
+import { HistoriqueModule } from '../historique/historique.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Prisonnier, Cellule]), UserModule],
+  imports: [TypeOrmModule.forFeature([Prisonnier, Cellule]), UserModule, HistoriqueModule],
   providers: [PrisonniersService, RolesGuard, PrisonniersSeeder],
   controllers: [PrisonniersController],
   exports: [TypeOrmModule, PrisonniersSeeder],
