@@ -61,4 +61,10 @@ export class IncidentsService {
     }
     return incident;
   }
+
+  async supprimer(id: number) {
+  const incident = await this.repoIncident.findOne({ where: { id } });
+  if (!incident) throw new NotFoundException('Incident introuvable');
+  await this.repoIncident.remove(incident);
+}
 }
