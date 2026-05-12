@@ -6,9 +6,10 @@ import { IncidentsService } from './incidents.service';
 import { IncidentsController } from './incidents.controller';
 import { RolesGuard } from '../guards/roles-guards';
 import { UserModule } from '../users/users.module';
+import { HistoriqueModule } from '../historique/historique.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Incident, Prisonnier]), UserModule],
+  imports: [TypeOrmModule.forFeature([Incident, Prisonnier]), UserModule, HistoriqueModule],
   providers: [IncidentsService, RolesGuard],
   controllers: [IncidentsController],
 })
