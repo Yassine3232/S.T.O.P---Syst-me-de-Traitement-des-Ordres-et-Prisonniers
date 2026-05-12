@@ -33,12 +33,8 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Roles(Profile.Directeur)
   @Post('/signup')
-  async createUser(@Body() body: CreateUserDto, @Session() session: any) {
+  async createUser(@Body() body: CreateUserDto) {
     const user = await this.authservice.signup(body.email, body.password, body.name, body.profile, body.dateNaissance);
-    
-    session.userId = user.id;
-    session.CurrentUser = user; 
-    
     return user;
   }
 
