@@ -8,6 +8,7 @@ import { CreerDemandeVisiteDto } from './dtos/creer-demande-visite.dto';
 import { RepondreDemandeVisiteDto } from './dtos/repondre-demande-visite.dto';
 import { CreerVisiteDto } from './dtos/creer-visite.dto';
 import { ModifierVisiteDto } from './dtos/modifier-visite.dto';
+import { HistoriqueService } from '../historique/historique.service';
 
 @Injectable()
 export class VisitesService {
@@ -15,6 +16,7 @@ export class VisitesService {
     @InjectRepository(Visite) private repoVisite: Repository<Visite>,
     @InjectRepository(Prisonnier) private repoPrisonnier: Repository<Prisonnier>,
     @InjectRepository(Incident) private repoIncident: Repository<Incident>,
+    private historiqueService: HistoriqueService,
   ) {}
 
   async soumettreDemandeVisite(donnees: CreerDemandeVisiteDto) {
@@ -43,24 +45,24 @@ export class VisitesService {
 
     const tousLesIncidents = await this.repoIncident.find({ relations: ['prisonniers'] });
     const incidentsLies: Incident[] = [];
-    
+
     for (let i = 0; i < tousLesIncidents.length; i++) {
       const incident = tousLesIncidents[i];
       let aCePrisonnier = false;
-      
+
       for (let j = 0; j < incident.prisonniers.length; j++) {
         if (incident.prisonniers[j].numeroIdentification === prisonnierId) {
           aCePrisonnier = true;
         }
       }
-      
+
       if (aCePrisonnier === true) {
         incidentsLies.push(incident);
       }
     }
 
-    const visitesPrecedentes = await this.repoVisite.find({ 
-      where: { prisonnier: { numeroIdentification: prisonnierId } as any } 
+    const visitesPrecedentes = await this.repoVisite.find({
+      where: { prisonnier: { numeroIdentification: prisonnierId } as any },
     });
 
     return {
@@ -84,9 +86,19 @@ export class VisitesService {
     if (donnees.decision === 'approuvee') {
       visite.statut = 'approuvee';
       visite.dateVisite = donnees.dateVisite;
+      await this.historiqueService.enregistrer(
+        visite.prisonnier,
+        'visite',
+        `Visite approuvée — ${visite.nomMembreFamille} le ${donnees.dateVisite}`,
+      );
     } else if (donnees.decision === 'refusee') {
       visite.statut = 'refusee';
       visite.motifRefus = donnees.motifRefus;
+      await this.historiqueService.enregistrer(
+        visite.prisonnier,
+        'visite',
+        `Visite refusée — Motif: ${donnees.motifRefus}`,
+      );
     } else {
       throw new BadRequestException('La décision doit être approuvee ou refusee');
     }
@@ -144,18 +156,10 @@ export class VisitesService {
       visite.prisonnier = prisonnier;
     }
 
-    if (donnees.nomVisiteur !== undefined) {
-      visite.nomVisiteur = donnees.nomVisiteur;
-    }
-    if (donnees.date !== undefined) {
-      visite.date = donnees.date;
-    }
-    if (donnees.heure !== undefined) {
-      visite.heure = donnees.heure;
-    }
-    if (donnees.duree !== undefined) {
-      visite.duree = donnees.duree;
-    }
+    if (donnees.nomVisiteur !== undefined) visite.nomVisiteur = donnees.nomVisiteur;
+    if (donnees.date !== undefined) visite.date = donnees.date;
+    if (donnees.heure !== undefined) visite.heure = donnees.heure;
+    if (donnees.duree !== undefined) visite.duree = donnees.duree;
 
     return this.repoVisite.save(visite);
   }

@@ -4,12 +4,21 @@ import { Repository } from 'typeorm';
 import { Prisonnier } from './prisonnier.entity';
 import { Cellule } from 'src/cellules/cellule.entity';
 import { CreatePrisonnierDto } from './dtos/create-prisonnier.dto';
+import { HistoriqueService } from '../historique/historique.service';
 
 @Injectable()
 export class PrisonniersService {
   constructor(
+<<<<<<< HEAD
     @InjectRepository(Prisonnier) private repoPrisonniers: Repository<Prisonnier>,
     @InjectRepository(Cellule) private repoCellules: Repository<Cellule>,
+=======
+    @InjectRepository(Prisonnier)
+    private repoPrisonniers: Repository<Prisonnier>,
+    @InjectRepository(Cellule)
+    private repoCellules: Repository<Cellule>,
+    private historiqueService: HistoriqueService,
+>>>>>>> main
   ) {}
 
   async create(donnees: CreatePrisonnierDto) {
@@ -18,6 +27,7 @@ export class PrisonniersService {
       throw new NotFoundException('Cellule "' + donnees.celluleNom + '" introuvable');
     }
 
+<<<<<<< HEAD
     const nbPrisonniers = await this.repoPrisonniers.count({ where: { cellule: { numeroIdentification: cellule.numeroIdentification } } as any });
     if (nbPrisonniers >= 2) {
       throw new Error('La cellule ' + donnees.celluleNom + ' est pleine (limite de 2).');
@@ -34,6 +44,18 @@ export class PrisonniersService {
       cellule: cellule,
     });
     return this.repoPrisonniers.save(nouveauPrisonnier);
+=======
+    const nouveauPrisonnier = this.repoPrisonniers.create({ ...donnees, cellule });
+    const sauvegarde = await this.repoPrisonniers.save(nouveauPrisonnier);
+
+    await this.historiqueService.enregistrer(
+      sauvegarde,
+      'creation',
+      `Dossier créé — Cellule: ${cellule.nom}`,
+    );
+
+    return sauvegarde;
+>>>>>>> main
   }
 
   async findById(id: number) {
@@ -47,8 +69,9 @@ export class PrisonniersService {
     return this.repoPrisonniers.find({ relations: ['cellule'] });
   }
 
-  async update(id: number, attrs: Partial<Prisonnier>) {
+  async update(id: number, attrs: Partial<Prisonnier> & { celluleNom?: string }) {
     const prisonnier = await this.findById(id);
+<<<<<<< HEAD
     if (prisonnier === null) {
       throw new Error('prisonnier not found');
     }
@@ -77,5 +100,38 @@ export class PrisonniersService {
     }
 
     return this.repoPrisonniers.save(prisonnier);
+=======
+    if (!prisonnier) throw new NotFoundException('Prisonnier introuvable');
+
+    const modifications: string[] = [];
+
+    if (attrs.celluleNom) {
+      const cellule = await this.repoCellules.findOneBy({ nom: attrs.celluleNom });
+      if (!cellule) throw new NotFoundException(`Cellule "${attrs.celluleNom}" introuvable`);
+      (attrs as any).cellule = cellule;
+      modifications.push(`Cellule changée: ${attrs.celluleNom}`);
+      delete attrs.celluleNom;
+    }
+
+    const champs = ['nom', 'prenom', 'accusation', 'dureePeine', 'dateSortiePrevue'] as const;
+    for (const champ of champs) {
+      if (attrs[champ] !== undefined && attrs[champ] !== (prisonnier as any)[champ]) {
+        modifications.push(`${champ}: ${(prisonnier as any)[champ]} → ${attrs[champ]}`);
+      }
+    }
+
+    Object.assign(prisonnier, attrs);
+    const sauvegarde = await this.repoPrisonniers.save(prisonnier);
+
+    if (modifications.length > 0) {
+      await this.historiqueService.enregistrer(
+        sauvegarde,
+        'modification',
+        modifications.join(', '),
+      );
+    }
+
+    return sauvegarde;
+>>>>>>> main
   }
 }
