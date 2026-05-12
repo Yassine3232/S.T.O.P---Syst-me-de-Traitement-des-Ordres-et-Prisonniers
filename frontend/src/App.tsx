@@ -6,6 +6,7 @@ import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 import Incidents from './components/Incidents';
 import Prisonniers from './components/Prisonniers';
+import Cellules from './components/Cellules';
 import Visites from './components/Visites';
 import Comptes from './components/Comptes';
 import DemandeVisite from './components/DemandeVisite';
@@ -21,6 +22,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/prisonniers" element={<Prisonniers />} />
+          <Route path="/cellules" element={<Cellules />} />
           <Route path="/visites" element={<Visites />} />
           <Route path="/comptes" element={<Comptes />} />
           <Route path="/visite" element={<DemandeVisite />} />

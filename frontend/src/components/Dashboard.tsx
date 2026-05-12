@@ -3,21 +3,41 @@ import { useAuth } from '../context/AuthContext';
 import './Dashboard.css';
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const auth = useAuth();
+  const user = auth.user;
+  const logout = auth.logout;
   const navigate = useNavigate();
 
-  if (!user) {
+  if (user === null || user === undefined) {
     navigate('/signin');
     return null;
   }
 
-  const isGarde = user.profile === 1;
-  const isDirecteur = user.profile === 2;
+  let isGarde = false;
+  if (user.profile === 1) {
+    isGarde = true;
+  }
 
-  const handleLogout = () => {
+  let isDirecteur = false;
+  if (user.profile === 2) {
+    isDirecteur = true;
+  }
+
+  function handleLogout() {
     logout();
     navigate('/');
-  };
+  }
+
+  function allerAuxIncidents() { navigate('/incidents'); }
+  function allerAuxPrisonniers() { navigate('/prisonniers'); }
+  function allerAuxCellules() { navigate('/cellules'); }
+  function allerAuxVisites() { navigate('/visites'); }
+  function allerAuxComptes() { navigate('/comptes'); }
+
+  let roleTexte = 'Directeur';
+  if (isGarde) {
+    roleTexte = 'Garde';
+  }
 
   return (
     <div className="dash-wrap">
@@ -29,14 +49,15 @@ export default function Dashboard() {
 
         <div className="dash-user">
           <p className="dash-user-name">{user.name}</p>
-          <p className="dash-user-role">{isGarde ? 'Garde' : 'Directeur'}</p>
+          <p className="dash-user-role">{roleTexte}</p>
         </div>
 
         <nav className="dash-nav">
-          <button onClick={() => navigate('/incidents')}>Incidents</button>
-          <button onClick={() => navigate('/prisonniers')}>Prisonniers</button>
-          {isDirecteur && <button onClick={() => navigate('/visites')}>Visites</button>}
-          {isDirecteur && <button onClick={() => navigate('/comptes')}>Comptes</button>}
+          <button onClick={allerAuxIncidents}>Incidents</button>
+          <button onClick={allerAuxPrisonniers}>Prisonniers</button>
+          <button onClick={allerAuxCellules}>Cellules</button>
+          <button onClick={allerAuxVisites}>Visites</button>
+          {isDirecteur && <button onClick={allerAuxComptes}>Comptes</button>}
         </nav>
 
         <button className="dash-logout" onClick={handleLogout}>Déconnexion</button>
