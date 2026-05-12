@@ -9,6 +9,8 @@ import { RepondreDemandeVisiteDto } from './dtos/repondre-demande-visite.dto';
 import { CreerVisiteDto } from './dtos/creer-visite.dto';
 import { ModifierVisiteDto } from './dtos/modifier-visite.dto';
 import { HistoriqueService } from '../historique/historique.service';
+import { CreerVisiteDto } from './dtos/creer-visite.dto';
+import { ModifierVisiteDto } from './dtos/modifier-visite.dto';
 
 @Injectable()
 export class VisitesService {
@@ -173,4 +175,37 @@ export class VisitesService {
 
     await this.repoVisite.remove(visite);
   }
+  async creer(donnees: CreerVisiteDto) {
+  const prisonnier = await this.repoPrisonnier.findOne({ where: { numeroIdentification: donnees.prisonnierId } });
+  if (!prisonnier) throw new NotFoundException('Prisonnier introuvable');
+
+  const nouvelleVisite = this.repoVisite.create({
+    prisonnier: prisonnier,
+    nomVisiteur: donnees.nomVisiteur,
+    date: donnees.date,
+    heure: donnees.heure,
+    duree: donnees.duree,
+    statut: 'en_attente',
+  });
+
+  return this.repoVisite.save(nouvelleVisite);
+}
+
+async modifier(id: number, donnees: ModifierVisiteDto) {
+  const visite = await this.repoVisite.findOne({ where: { id: id }, relations: ['prisonnier'] });
+  if (!visite) throw new NotFoundException('Visite introuvable');
+
+  if (donnees.prisonnierId !== undefined) {
+    const prisonnier = await this.repoPrisonnier.findOne({ where: { numeroIdentification: donnees.prisonnierId } });
+    if (!prisonnier) throw new NotFoundException('Prisonnier introuvable');
+    visite.prisonnier = prisonnier;
+  }
+
+  if (donnees.nomVisiteur !== undefined) visite.nomVisiteur = donnees.nomVisiteur;
+  if (donnees.date !== undefined) visite.date = donnees.date;
+  if (donnees.heure !== undefined) visite.heure = donnees.heure;
+  if (donnees.duree !== undefined) visite.duree = donnees.duree;
+
+  return this.repoVisite.save(visite);
+}
 }
