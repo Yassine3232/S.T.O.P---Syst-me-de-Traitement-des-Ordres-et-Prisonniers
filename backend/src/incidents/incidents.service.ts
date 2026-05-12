@@ -4,12 +4,14 @@ import { Repository } from 'typeorm';
 import { Incident } from './incident.entity';
 import { Prisonnier } from '../prisonniers/prisonnier.entity';
 import { CreerIncidentDto } from './dtos/creer-incident.dto';
+import { HistoriqueService } from '../historique/historique.service';
 
 @Injectable()
 export class IncidentsService {
   constructor(
     @InjectRepository(Incident) private repoIncident: Repository<Incident>,
     @InjectRepository(Prisonnier) private repoPrisonnier: Repository<Prisonnier>,
+    private historiqueService: HistoriqueService,
   ) {}
 
   async creerIncident(donnees: CreerIncidentDto) {
@@ -35,7 +37,17 @@ export class IncidentsService {
       prisonniers: prisonniersTrouves,
     });
 
-    return this.repoIncident.save(nouvelIncident);
+    const sauvegarde = await this.repoIncident.save(nouvelIncident);
+
+    for (const prisonnier of prisonniersTrouves) {
+      await this.historiqueService.enregistrer(
+        prisonnier,
+        'incident',
+        `Incident "${donnees.type}" — ${donnees.description} — Rapporté par: ${donnees.rapportePar}`,
+      );
+    }
+
+    return sauvegarde;
   }
 
   async trouverTous() {
