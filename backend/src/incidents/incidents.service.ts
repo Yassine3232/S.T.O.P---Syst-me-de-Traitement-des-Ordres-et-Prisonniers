@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Incident } from './incident.entity';
 import { Prisonnier } from '../prisonniers/prisonnier.entity';
 import { CreerIncidentDto } from './dtos/creer-incident.dto';
@@ -61,10 +61,26 @@ export class IncidentsService {
     }
     return incident;
   }
+  async modifier(id: number, donnees: Partial<CreerIncidentDto>) {
+    const incident = await this.repoIncident.findOne({ where: { id }, relations: ['prisonniers'] });
+    if (!incident) throw new NotFoundException('Incident introuvable');
+
+    if (donnees.type) incident.type = donnees.type;
+    if (donnees.description) incident.description = donnees.description;
+    if (donnees.dateHeure) incident.dateHeure = donnees.dateHeure;
+    if (donnees.rapportePar) incident.rapportePar = donnees.rapportePar;
+
+    if (donnees.prisonniersIds && donnees.prisonniersIds.length > 0) {
+      const prisonniers = await this.repoPrisonnier.findBy({ numeroIdentification: In(donnees.prisonniersIds) });
+      incident.prisonniers = prisonniers;
+    }
+
+    return this.repoIncident.save(incident);
+  }
 
   async supprimer(id: number) {
-  const incident = await this.repoIncident.findOne({ where: { id } });
-  if (!incident) throw new NotFoundException('Incident introuvable');
-  await this.repoIncident.remove(incident);
-}
+    const incident = await this.repoIncident.findOne({ where: { id } });
+    if (!incident) throw new NotFoundException('Incident introuvable');
+    await this.repoIncident.remove(incident);
+  }
 }

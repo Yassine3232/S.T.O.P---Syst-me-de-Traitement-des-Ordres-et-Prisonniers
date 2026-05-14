@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { IncidentsService } from './incidents.service';
 import { CreerIncidentDto } from './dtos/creer-incident.dto';
 import { Profile } from 'src/users/enum/profile.enum';
@@ -28,6 +28,13 @@ export class IncidentsController {
   @Get('/:id')
   voirIncident(@Param('id', ParseIntPipe) id: number) {
     return this.incidentsService.trouverParId(id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Profile.Directeur)
+  @Patch('/:id')
+  modifierIncident(@Param('id', ParseIntPipe) id: number, @Body() body: Partial<CreerIncidentDto>) {
+    return this.incidentsService.modifier(id, body);
   }
 
   @UseGuards(RolesGuard)
